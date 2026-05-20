@@ -1,0 +1,33 @@
+name: Build iOS App
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: macos-14
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Create App Structure
+        run: |
+          mkdir -p MathsApp9.app
+
+      - name: Compile for iOS
+        run: |
+          xcrun --sdk iphoneos swiftc \
+            -target arm64-apple-ios15.0 \
+            -o MathsApp9.app/MathsApp9 \
+            MathsApp9App.swift ContentView.swift MathEngine.swift
+
+      - name: Zip Build Product
+        run: zip -r MathsApp9_iOS.zip MathsApp9.app
+
+      - name: Upload Binary Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Native-iOS-Binary
+          path: MathsApp9_iOS.zip
